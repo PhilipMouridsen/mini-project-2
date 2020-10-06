@@ -3,11 +3,14 @@ import java.net.*;
 import java.io.*;
 
 public class PubSubSystem {
+    private static List<Socket> connections = new ArrayList<Socket>();
+
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(12345);
         while (true) {
             System.out.println("SERVER: Listening for incoming connections...");
             Socket connection = serverSocket.accept();  // waits here until a client connects
+            connections.add(connection);
             new Thread(new ClientHandler(connection)).start();
         }
     }
@@ -29,14 +32,12 @@ public class PubSubSystem {
         public void run() {
             String msg = null;
             try {
-              msg = this.input.readLine();
               DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-              out.write(msg.getBytes());
+              msg = input.readLine();
+              out.writeUTF(msg);
               out.flush();
-              /*String test = "test";
-              DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-              out.writeUTF(test);
-              out.flush();*/
+              out.close();
+              connection.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
