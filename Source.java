@@ -2,23 +2,29 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
-public class Source{
-  public static void main(String[] args){
-    Scanner sc = new Scanner(System.in);
-    int port = 12345;
-    while(true){
-      try{
-        String input = sc.nextLine();
-        Socket source = new Socket("localhost", port);
-        DataOutputStream out = new DataOutputStream(source.getOutputStream());
-        out.write(input.getBytes());
-        out.flush();
+public class Source {
+    public static void main(String[] args) {
 
-        out.close();
-        source.close();
-      } catch (IOException e){
-        e.printStackTrace();
-      }
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+
+            try {
+
+                // Connect to PubSub.
+                Socket socket = new Socket("localhost", 12345);
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+                // Read and send out data.
+                String input = scanner.nextLine();
+                out.write(input.getBytes());
+                out.flush();
+                out.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
+        }
     }
-  }
 }
