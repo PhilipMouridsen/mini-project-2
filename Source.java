@@ -10,13 +10,11 @@ public class Source{
       try{
         String input = sc.nextLine();
         Socket source = new Socket("localhost", port);
-        OutputStream toServer = source.getOutputStream();
-        DataOutputStream out = new DataOutputStream(toServer);
+        DataOutputStream out = new DataOutputStream(source.getOutputStream());
         out.write(input.getBytes());
         out.flush();
 
         out.close();
-        toServer.close();
         source.close();
       } catch (IOException e){
         e.printStackTrace();
