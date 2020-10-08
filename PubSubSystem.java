@@ -3,7 +3,7 @@ import java.net.*;
 import java.io.*;
 
 public class PubSubSystem {
-    private static List<Socket> connections = new ArrayList<Socket>();
+    private static List<Socket> connections = new ArrayList<Socket>();//connection need to be dynamic, possible to removed and added
 
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(12345);
@@ -29,15 +29,18 @@ public class PubSubSystem {
             this.input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         }
 
+        //Whenever a string is received the whole collection is iterated and send to each connection
+        //does the thread get terminated?
         public void run() {
             String msg = null;
             try {
-              DataOutputStream out = new DataOutputStream(connection.getOutputStream());
               msg = input.readLine();
-              out.writeUTF(msg);
-              out.flush();
-              out.close();
-              connection.close();
+              for(Socket con : connections){
+                DataOutputStream out = new DataOutputStream(con.getOutputStream());
+                out.writeUTF(msg);
+                //out.flush();
+                //out.close();
+              }
             } catch (IOException e) {
                 e.printStackTrace();
             }

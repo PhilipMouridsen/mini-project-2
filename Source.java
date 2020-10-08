@@ -13,9 +13,8 @@ public class Source{
         DataOutputStream out = new DataOutputStream(source.getOutputStream());
         out.write(input.getBytes());
         out.flush();
-
         out.close();
-        source.close();
+        //source.close();
       } catch (IOException e){
         e.printStackTrace();
       }

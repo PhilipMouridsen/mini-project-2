@@ -11,8 +11,8 @@ public class Sink {
         DataInputStream in = new DataInputStream(sink.getInputStream());
         System.out.println("Server says " + in.readUTF());
 
-        in.close();
-        sink.close();
+        //in.close();
+        //sink.close();
       } catch (IOException e){
         e.printStackTrace();
       }
