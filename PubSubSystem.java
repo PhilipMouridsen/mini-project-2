@@ -19,6 +19,7 @@ public class PubSubSystem {
         return socket.getInetAddress() + ":" + socket.getPort();
     }
 
+
     private static class ClientHandler implements Runnable {
         Socket connection;
         BufferedReader input;
@@ -33,13 +34,11 @@ public class PubSubSystem {
             String msg = null;
             try {
               msg = input.readLine();
-              for(Socket con : connections){ //delete from connections if isClosed is true
-                if(!con.isClosed()){
-                  DataOutputStream out = new DataOutputStream(con.getOutputStream());
-                  out.writeUTF(msg);
-                } else {
-                  connections.remove(con);
-                }
+              for(Socket con : connections){
+                DataOutputStream out = new DataOutputStream(con.getOutputStream());
+                out.writeUTF(msg);
+                out.close();
+                connections.remove(con);
               }
             } catch (IOException e) {
                 e.printStackTrace();
