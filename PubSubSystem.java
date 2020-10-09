@@ -29,17 +29,17 @@ public class PubSubSystem {
             this.input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         }
 
-        //Whenever a string is received the whole collection is iterated and send to each connection
-        //does the thread get terminated?
         public void run() {
             String msg = null;
             try {
               msg = input.readLine();
-              for(Socket con : connections){
-                DataOutputStream out = new DataOutputStream(con.getOutputStream());
-                out.writeUTF(msg);
-                //out.flush();
-                //out.close();
+              for(Socket con : connections){ //delete from connections if isClosed is true
+                if(!con.isClosed()){
+                  DataOutputStream out = new DataOutputStream(con.getOutputStream());
+                  out.writeUTF(msg);
+                } else {
+                  connections.remove(con);
+                }
               }
             } catch (IOException e) {
                 e.printStackTrace();

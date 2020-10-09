@@ -14,7 +14,6 @@ public class Source{
         out.write(input.getBytes());
         out.flush();
         out.close();
-        //source.close();
       } catch (IOException e){
         e.printStackTrace();
       }
