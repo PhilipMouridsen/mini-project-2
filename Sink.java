@@ -15,6 +15,10 @@ public class Sink {
             
             try {
 
+                DataOutputStream out = new DataOutputStream(sink.getOutputStream());
+                out.writeByte(2);
+                out.flush();
+
                 DataInputStream in = new DataInputStream(sink.getInputStream());
                 System.out.println("Server says " + in.readUTF());
                 in.close();
