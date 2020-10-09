@@ -3,48 +3,64 @@ import java.net.*;
 import java.io.*;
 
 public class PubSubSystem {
-    private static List<Socket> connections = new ArrayList<Socket>();//connection need to be dynamic, possible to removed and added
+    private static List<Socket> connections = new ArrayList<>();// Connections need to be dynamic, possible to
+                                                                // removed and added.
 
     public static void main(String[] args) throws IOException {
+
+        // Start the PubSub System.
         ServerSocket serverSocket = new ServerSocket(12345);
+
         while (true) {
-            System.out.println("SERVER: Listening for incoming connections...");
-            Socket connection = serverSocket.accept();  // waits here until a client connects
+            System.out.println("PubSub: Listening for incoming connections...");
+
+            Socket connection = serverSocket.accept(); // Waits here until a client connects.
             connections.add(connection);
             new Thread(new ClientHandler(connection)).start();
         }
     }
 
-    private static String address(Socket socket) {
+    static String address(Socket socket) {
         return socket.getInetAddress() + ":" + socket.getPort();
     }
 
-    private static class ClientHandler implements Runnable {
+    static class ClientHandler implements Runnable {
+
         Socket connection;
         BufferedReader input;
 
         ClientHandler(Socket connection) throws IOException {
-            System.out.println("SERVER: Connected to client: " + PubSubSystem.address(connection));
+            System.out.println("PubSub: Connected to source: " + PubSubSystem.address(connection));
             this.connection = connection;
-            this.input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         }
 
         public void run() {
+
             String msg = null;
+
+            List<Socket> snapshotSockets = new ArrayList<>(connections);
+
             try {
-              msg = input.readLine();
-              for(Socket con : connections){ //delete from connections if isClosed is true
-                if(!con.isClosed()){
-                  DataOutputStream out = new DataOutputStream(con.getOutputStream());
-                  out.writeUTF(msg);
-                } else {
-                  connections.remove(con);
+
+                this.input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                msg = input.readLine();
+
+                for (Socket con : snapshotSockets) {
+                    
+                    DataOutputStream out = new DataOutputStream(con.getOutputStream());
+                    out.writeUTF(msg);
+                    
+                    out.flush();
+                    out.close();
+
+                    connections.remove(con);
                 }
-              }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("SERVER: Received a message from client " + PubSubSystem.address(connection) + ": " + msg);
+
+            System.out.println("PubSub: Received a message from source: " + PubSubSystem.address(connection) + ": " + msg);
         }
     }
 }
