@@ -1,0 +1,7 @@
+There 10 kinds of people, the ones which understand binary numbers and the once which don't.
+
+Definition of recursion: If you did not understand the definition of recursion, see definition of recursion.
+
+I’ve got a really good UDP joke to tell you, but I don’t know if you’ll get it. 
+
+A TCP packet walks into a bar and says, "I'd like a beer." The bartender replies, "You want a beer?" The TCP packet replies, "Yes, I'd like a beer."

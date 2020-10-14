@@ -1,0 +1,19 @@
+Hei Simon,
+
+We are stuck in the MP2, it would be super cool if you could help us. 
+We are using a Source, a Sink and a PubSubSystem class. 
+Sources and Sinks connect to the PubSubSystem. It works fine 
+just from Source to PubSub. The problems start when we connect also a sink. 
+We can forward some messages from a source process over the PubSub to a sink, but 
+not all and we get a lot of exception. We think the problem can be easily solved in case we
+could distinguish in the PubSub which connections are sources and which are sinks as soon as they connect, 
+is there a way to figure this out?
+
+Further, we create a new socket and stream for each read/write in the sink/source, we think this is necessary 
+but we are not sure about that.
+
+The following link leads to our repo where you can check out our code: 
+
+https://github.itu.dk/emch/mini-project-2
+
+Thanks a lot!

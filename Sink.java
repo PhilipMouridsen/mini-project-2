@@ -6,7 +6,7 @@ public class Sink {
   public static void main(String[] args) throws IOException {
     int port = 12345;
     Socket sink = null;
-    
+
     while(true){
       try{
         sink = new Socket("localhost", port);

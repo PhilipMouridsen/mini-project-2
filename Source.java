@@ -13,8 +13,12 @@ public class Source{
       try{
         String input = sc.nextLine();
         DataOutputStream out = new DataOutputStream(source.getOutputStream());
+        out.writeByte(1);
+        out.flush();
+
         out.write(input.getBytes());
         out.flush();
+
         out.close();
       } catch (IOException e){
         e.printStackTrace();

@@ -10,7 +10,10 @@ public class PubSubSystem {
         while (true) {
             System.out.println("SERVER: Listening for incoming connections...");
             Socket connection = serverSocket.accept();  // waits here until a client connects
-            connections.add(connection);
+            DataInputStream in = new DataInputStream(connection.getInputStream());
+            byte identifier = in.readByte();
+            if(identifier == 0)
+              connections.add(connection);
             new Thread(new ClientHandler(connection)).start();
         }
     }
@@ -21,8 +24,9 @@ public class PubSubSystem {
 
 
     private static class ClientHandler implements Runnable {
-        Socket connection;
-        BufferedReader input;
+        private Socket connection;
+        private BufferedReader input;
+        private List<Socket> snapshotCon;
 
         ClientHandler(Socket connection) throws IOException {
             System.out.println("SERVER: Connected to client: " + PubSubSystem.address(connection));
@@ -31,10 +35,11 @@ public class PubSubSystem {
         }
 
         public void run() {
+            snapshotCon = new ArrayList<Socket>(connections);
             String msg = null;
             try {
               msg = input.readLine();
-              for(Socket con : connections){
+              for(Socket con : snapshotCon){
                 DataOutputStream out = new DataOutputStream(con.getOutputStream());
                 out.writeUTF(msg);
                 out.close();
@@ -43,7 +48,8 @@ public class PubSubSystem {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("SERVER: Received a message from client " + PubSubSystem.address(connection) + ": " + msg);
+            if(!msg.equals(null))
+              System.out.println("SERVER: Received a message from client " + PubSubSystem.address(connection) + ": " + msg);
         }
     }
 }
