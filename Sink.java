@@ -6,13 +6,12 @@ public class Sink {
     public static void main(String[] args) throws UnknownHostException, IOException {
 
         int port = 12345;
-        
         Socket sink = null;
 
         while (true) {
 
             sink = new Socket("localhost", port);
-            
+
             try {
 
                 DataOutputStream out = new DataOutputStream(sink.getOutputStream());
@@ -26,9 +25,6 @@ public class Sink {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
-
     }
-
 }

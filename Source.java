@@ -4,7 +4,7 @@ import java.io.*;
 
 public class Source {
     public static void main(String[] args) throws UnknownHostException, IOException {
-        
+
         Scanner sc = new Scanner(System.in);
         int port = 12345;
 
@@ -14,12 +14,12 @@ public class Source {
         while (true) {
 
             source = new Socket("localhost", port);
-
+            
             try {
-
+                
                 DataOutputStream out = new DataOutputStream(source.getOutputStream());
 
-                out.writeByte(1); // Identify as sink.
+                out.writeByte(1); // Identify as source.
                 out.flush();
 
                 // Start reading in lines.
@@ -32,9 +32,6 @@ public class Source {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
-
     }
-    
 }

@@ -3,7 +3,7 @@ import java.net.*;
 import java.io.*;
 
 public class PubSubSystem {
-    private static List<Socket> sinks = Collections.synchronizedList(new ArrayList<>());// Connections need to be dynamic, possible to removed and added.
+    private static List<Socket> sinks = Collections.synchronizedList(new ArrayList<>());
 
     public static void main(String[] args) throws IOException {
 
@@ -20,14 +20,12 @@ public class PubSubSystem {
                 case 1:
                     System.out.println("It's a source!");
                     break;
-
                 case 2:
                     System.out.println("It's a sink!");
                     sinks.add(connection);
                     break;
-
                 default:
-                    System.out.println("Didn't receive shit.");
+                    System.out.println("Didn't receive anything.");
             }
 
             new Thread(new ClientHandler(connection)).start();
@@ -39,32 +37,27 @@ public class PubSubSystem {
     }
 
     static class ClientHandler implements Runnable {
-
         Socket connection;
-        BufferedReader input;
 
         ClientHandler(Socket connection) throws IOException {
-            System.out.println("PubSub: Connected to source: " + PubSubSystem.address(connection));
+            System.out.println("PubSub: Connected to source or sink: " + PubSubSystem.address(connection));
             this.connection = connection;
-            this.input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         }
 
         public void run() {
-
             String msg = null;
 
             try {
-
                 if (!sinks.contains(connection)) {
-                    msg = input.readLine();
-                }
+                    DataInputStream in = new DataInputStream(connection.getInputStream());
+                    msg = in.readUTF();
 
-                for (Socket sink : sinks) {
-
-                    if (!sink.isClosed()) {
-                        DataOutputStream out = new DataOutputStream(sink.getOutputStream());
-                        out.writeUTF(msg);
-                        out.close();
+                    for (Socket sink : sinks) {
+                        if (!sink.isClosed()) {
+                            DataOutputStream out = new DataOutputStream(sink.getOutputStream());
+                            out.writeUTF(msg);
+                            out.close();
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -76,14 +69,15 @@ public class PubSubSystem {
             synchronized (sinks) {
                 Iterator<Socket> sinkIterator = sinks.listIterator();
                 while (sinkIterator.hasNext()) {
-                    if(sinkIterator.next().isClosed()) {
+                    if (sinkIterator.next().isClosed()) {
                         sinkIterator.remove();
                     }
                 }
             }
 
             // System.out.println(
-            //         "PubSub: Received a message from source: " + PubSubSystem.address(connection) + ": " + msg);
+            // "PubSub: Received a message from source: " + PubSubSystem.address(connection)
+            // + ": " + msg);
         }
     }
 }
