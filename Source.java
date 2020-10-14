@@ -27,7 +27,6 @@ public class Source {
 
                 out.writeUTF(input);
                 out.flush();
-
                 out.close();
 
             } catch (IOException e) {

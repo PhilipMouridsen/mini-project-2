@@ -3,9 +3,7 @@ import java.net.*;
 import java.io.*;
 
 public class PubSubSystem {
-    private static List<Socket> sinks = Collections.synchronizedList(new ArrayList<>());// Connections need to be dynamic, possible to
-                                                          // removed and added.
-    private static List<Socket> sources = Collections.synchronizedList(new ArrayList<>());
+    private static List<Socket> sinks = Collections.synchronizedList(new ArrayList<>());// Connections need to be dynamic, possible to removed and added.
 
     public static void main(String[] args) throws IOException {
 
@@ -21,7 +19,6 @@ public class PubSubSystem {
             switch (in.readByte()) {
                 case 1:
                     System.out.println("It's a source!");
-                    sources.add(connection);
                     break;
 
                 case 2:
@@ -49,6 +46,7 @@ public class PubSubSystem {
         ClientHandler(Socket connection) throws IOException {
             System.out.println("PubSub: Connected to source: " + PubSubSystem.address(connection));
             this.connection = connection;
+            this.input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         }
 
         public void run() {
@@ -56,41 +54,22 @@ public class PubSubSystem {
             String msg = null;
 
             try {
+                msg = input.readLine();
 
-                for (Socket source : sources) {
+                for (Socket sink : sinks) {
 
-                    if (!source.isClosed()) {
-
-                        this.input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                        msg = input.readLine();
-
-                        for (Socket sink : sinks) {
-
-                            if (!sink.isClosed()) {
-                                DataOutputStream out = new DataOutputStream(sink.getOutputStream());
-                                out.writeUTF(msg);
-                                out.close();
-                            }
-                        }
+                    if (!sink.isClosed()) {
+                        DataOutputStream out = new DataOutputStream(sink.getOutputStream());
+                        out.writeUTF(msg);
+                        out.close();
                     }
                 }
-
             } catch (IOException e) {
                 System.out.println("Caught exception!!!!");
                 e.printStackTrace();
             }
 
             // Do some cleaning, by removing closed sources and sinks...
-
-            synchronized (sources) {
-                Iterator<Socket> socketIterator = sources.listIterator();
-                while (socketIterator.hasNext()) {
-                    if(socketIterator.next().isClosed()) {
-                        socketIterator.remove();
-                    }
-                } 
-            }
-
             synchronized (sinks) {
                 Iterator<Socket> sinkIterator = sinks.listIterator();
                 while (sinkIterator.hasNext()) {
