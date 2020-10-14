@@ -3,33 +3,36 @@ import java.net.*;
 import java.io.*;
 
 public class Source {
-  public static void main(String[] args) throws UnknownHostException, IOException {
+    public static void main(String[] args) throws UnknownHostException, IOException {
 
-    Scanner sc = new Scanner(System.in);
-    int port = 12345;
+        Scanner sc = new Scanner(System.in);
+        int port = 12345;
 
-    // Connect to the PubSub.
-    Socket source = null;
+        // Connect to the PubSub.
+        Socket source = null;
 
-    while (true) {
-      source = new Socket("localhost", port);
-      try {
-        DataOutputStream out = new DataOutputStream(source.getOutputStream());
+        while (true) {
 
-        out.writeByte(1); // Identify as sink.
-        out.flush();
+            source = new Socket("localhost", port);
+            
+            try {
+                
+                DataOutputStream out = new DataOutputStream(source.getOutputStream());
 
-        // Start reading in lines.
-        String input = sc.nextLine();
-        
-        out.writeUTF(input);
-        out.flush();
+                out.writeByte(1); // Identify as source.
+                out.flush();
 
-        out.close();
+                // Start reading in lines.
+                String input = sc.nextLine();
 
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+                out.writeUTF(input);
+                out.flush();
+
+                out.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
-  }
 }
