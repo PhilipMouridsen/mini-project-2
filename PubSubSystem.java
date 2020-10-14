@@ -37,7 +37,6 @@ public class PubSubSystem {
 
   static class ClientHandler implements Runnable {
     Socket connection;
-    BufferedReader input;
 
     ClientHandler(Socket connection) throws IOException {
       System.out.println("PubSub: Connected to source: " + PubSubSystem.address(connection));
@@ -49,8 +48,8 @@ public class PubSubSystem {
 
       try {
         if (!sinks.contains(connection)) {
-          this.input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-          msg = input.readLine();
+          DataInputStream in = new DataInputStream(connection.getInputStream());
+          msg = in.readUTF();
 
           for (Socket sink : sinks) {
             if (!sink.isClosed()) {
