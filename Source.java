@@ -19,7 +19,7 @@ public class Source {
 
                 DataOutputStream out = new DataOutputStream(source.getOutputStream());
 
-                out.writeByte(1);
+                out.writeByte(1); // Identify as sink.
                 out.flush();
 
                 // Start reading in lines.

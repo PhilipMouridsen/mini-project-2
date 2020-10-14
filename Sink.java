@@ -16,11 +16,11 @@ public class Sink {
             try {
 
                 DataOutputStream out = new DataOutputStream(sink.getOutputStream());
-                out.writeByte(2);
+                out.writeByte(2); // Identify as sink.
                 out.flush();
 
                 DataInputStream in = new DataInputStream(sink.getInputStream());
-                System.out.println("Server says " + in.readUTF());
+                System.out.println("Source says via PubSub: " + in.readUTF());
                 in.close();
 
             } catch (IOException e) {

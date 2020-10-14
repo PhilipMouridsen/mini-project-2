@@ -3,8 +3,9 @@ import java.net.*;
 import java.io.*;
 
 public class PubSubSystem {
-    private static List<Socket> sinks = new ArrayList<>();// Connections need to be dynamic, possible to
+    private static List<Socket> sinks = Collections.synchronizedList(new ArrayList<>());// Connections need to be dynamic, possible to
                                                           // removed and added.
+    private static List<Socket> sources = Collections.synchronizedList(new ArrayList<>());
 
     public static void main(String[] args) throws IOException {
 
@@ -20,6 +21,7 @@ public class PubSubSystem {
             switch (in.readByte()) {
                 case 1:
                     System.out.println("It's a source!");
+                    sources.add(connection);
                     break;
 
                 case 2:
@@ -55,30 +57,51 @@ public class PubSubSystem {
 
             try {
 
-                this.input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                msg = input.readLine();
+                for (Socket source : sources) {
 
-                for (Socket sink : sinks) {
+                    if (!source.isClosed()) {
 
-                    if (!sink.isClosed()) {
+                        this.input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                        msg = input.readLine();
 
-                        DataOutputStream out = new DataOutputStream(sink.getOutputStream());
-                        out.writeUTF(msg);
+                        for (Socket sink : sinks) {
 
-                        out.flush();
-                        out.close();
-
-                        sinks.remove(sink);
+                            if (!sink.isClosed()) {
+                                DataOutputStream out = new DataOutputStream(sink.getOutputStream());
+                                out.writeUTF(msg);
+                                out.close();
+                            }
+                        }
                     }
-                    
                 }
 
             } catch (IOException e) {
+                System.out.println("Caught exception!!!!");
                 e.printStackTrace();
             }
 
-            System.out.println(
-                    "PubSub: Received a message from source: " + PubSubSystem.address(connection) + ": " + msg);
+            // Do some cleaning, by removing closed sources and sinks...
+
+            synchronized (sources) {
+                Iterator<Socket> socketIterator = sources.listIterator();
+                while (socketIterator.hasNext()) {
+                    if(socketIterator.next().isClosed()) {
+                        socketIterator.remove();
+                    }
+                } 
+            }
+
+            synchronized (sinks) {
+                Iterator<Socket> sinkIterator = sinks.listIterator();
+                while (sinkIterator.hasNext()) {
+                    if(sinkIterator.next().isClosed()) {
+                        sinkIterator.remove();
+                    }
+                }
+            }
+
+            // System.out.println(
+            //         "PubSub: Received a message from source: " + PubSubSystem.address(connection) + ": " + msg);
         }
     }
 }
