@@ -54,7 +54,10 @@ public class PubSubSystem {
             String msg = null;
 
             try {
-                msg = input.readLine();
+
+                if (!sinks.contains(connection)) {
+                    msg = input.readLine();
+                }
 
                 for (Socket sink : sinks) {
 
